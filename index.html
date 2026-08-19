@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Form Generator</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f172a; color: white; padding: 20px; }
+        .card { max-width: 650px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 10px; border: 1px solid #334155; }
+        h3 { margin-top: 0; color: #38bdf8; text-align: center; }
+        .row { display: flex; gap: 10px; margin-bottom: 8px; }
+        .field { flex: 1; }
+        label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 3px; font-weight: bold; }
+        input, select { width: 100%; padding: 6px; border: 1px solid #334155; border-radius: 4px; background: #0f172a; color: white; font-size: 12px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #22c55e; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 14px; }
+        button:hover { background: #16a34a; }
+        #status { font-size: 12px; margin-top: 10px; text-align: center; font-weight: bold; }
+        .sec { font-size: 12px; color: #38bdf8; margin: 12px 0 6px 0; font-weight: bold; border-bottom: 1px solid #334155; padding-bottom: 3px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h3>📄 College Form Generator</h3>
+    
+    <!-- Hidden Fixed Values -->
+    <div class="hidden">
+        <input type="text" id="univ_name1" value="GURUGRAM UNIVERSITY">
+        <input type="text" id="univ_name2" value="GURUGRAM UNIVERSITY">
+        <input type="text" id="univ_name3" value="GURUGRAM UNIVERSITY">
+        <input type="text" id="religion" value="HINDU">
+        <input type="text" id="nationality" value="Indian">
+        <input type="text" id="domicile" value="Haryana">
+        <input type="text" id="area_type" value="URBAN">
+        <input type="text" id="state" value="Haryana">
+        <input type="text" id="sem1_name" value="Semester 1">
+        <input type="text" id="sem1_res" value="PASS">
+        <input type="text" id="sem2_name" value="Semester 2">
+        <input type="text" id="sem2_res" value="PASS">
+        <input type="text" id="sem3_name" value="Semester 3">
+        <input type="text" id="sem3_res" value="PASS">
+    </div>
+
+    <!-- Form Selection & Dynamic Photo Field -->
+    <div class="row">
+        <div class="field">
+            <label>Select Form Type *</label>
+            <select id="formSelector" onchange="togglePhotoField()">
+                <option value="admission form.pdf">Admission Form</option>
+                <option value="registration form.pdf">Registration Form</option>
+                <option value="identity form.pdf">Identity Form</option>
+            </select>
+        </div>
+        <div class="field" id="photoContainer">
+            <label>Upload Photo *</label>
+            <input type="file" id="photoFile" accept="image/jpeg, image/png">
+        </div>
+    </div>
+
+    <!-- 1. Academic & Personal Info -->
+    <div class="sec">1. Academic & Personal Info</div>
+    <div class="row">
+        <div class="field"><label>Class</label><input type="text" id="class" value="B.Sc 3rd Year"></div>
+        <div class="field"><label>Registration No.</label><input type="text" id="reg_no" placeholder="Reg No."></div>
+        <div class="field"><label>Category</label><input type="text" id="category" value="GENERAL"></div>
+    </div>
+    <div class="row">
+        <div class="field"><label>Student Name</label><input type="text" id="name" placeholder="Enter Name"></div>
+        <div class="field"><label>DOB</label><input type="text" id="dob" placeholder="DD/MM/YYYY"></div>
+    </div>
+    <div class="row">
+        <div class="field"><label>Father's Name</label><input type="text" id="fname" placeholder="Father's Name"></div>
+        <div class="field"><label>Mother's Name</label><input type="text" id="mname" placeholder="Mother's Name"></div>
+    </div>
+
+    <!-- 2. Contact & Identity -->
+    <div class="sec">2. Contact & Identity</div>
+    <div class="row">
+        <div class="field"><label>Mobile No.</label><input type="text" id="mobile" placeholder="Mobile Number"></div>
+        <div class="field"><label>Aadhaar No.</label><input type="text" id="aadhar" placeholder="Aadhaar No."></div>
+    </div>
+    <div class="row">
+        <div class="field"><label>APAAR ID</label><input type="text" id="apaar" placeholder="APAAR ID"></div>
+        <div class="field"><label>Email ID</label><input type="text" id="email" placeholder="Email Address"></div>
+    </div>
+
+    <!-- 3. Attributes & Address -->
+    <div class="sec">3. Attributes & Address</div>
+    <div class="row">
+        <div class="field"><label>Gender</label><input type="text" id="gender" value="MALE"></div>
+        <div class="field"><label>NSS/NCC</label><input type="text" id="nss_ncc" value="NO"></div>
+        <div class="field"><label>District</label><input type="text" id="district" value="GURUGRAM"></div>
+    </div>
+    <div class="row">
+        <div class="field"><label>Full Address</label><input type="text" id="address" placeholder="Enter Full Address"></div>
+        <div class="field"><label>Pincode</label><input type="text" id="pincode" placeholder="Pincode"></div>
+    </div>
+
+    <!-- 4. Previous Roll Numbers -->
+    <div class="sec">4. Semester Roll Numbers</div>
+    <div class="row">
+        <div class="field"><label>Sem 1 Roll No.</label><input type="text" id="sem1_roll" placeholder="Semester 1 Roll No"></div>
+        <div class="field"><label>Sem 2 Roll No.</label><input type="text" id="sem2_roll" placeholder="Semester 2 Roll No"></div>
+        <div class="field"><label>Sem 3 Roll No.</label><input type="text" id="sem3_roll" placeholder="Semester 3 Roll No"></div>
+    </div>
+
+    <button onclick="generatePDF()">Generate & Download PDF</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    // Toggle photo field based on selection
+    function togglePhotoField() {
+        const selectedForm = document.getElementById('formSelector').value;
+        const photoContainer = document.getElementById('photoContainer');
+        
+        if (selectedForm === 'admission form.pdf') {
+            photoContainer.classList.remove('hidden');
+        } else {
+            photoContainer.classList.add('hidden');
+        }
+    }
+
+    async function generatePDF() {
+        const photoInput = document.getElementById('photoFile');
+        const selectedForm = document.getElementById('formSelector').value;
+        const status = document.getElementById('status');
+
+        status.style.color = "#38bdf8";
+        status.innerText = `Loading ${selectedForm}...`;
+
+        try {
+            const response = await fetch(encodeURIComponent(selectedForm));
+            if (!response.ok) throw new Error(`${selectedForm} nahi mila! Check karo repository me file hai ya nahi.`);
+            
+            const arrayBuffer = await response.arrayBuffer();
+            status.innerText = "Generating PDF...";
+
+            const { PDFDocument, rgb, StandardFonts } = PDFLib;
+            const pdfDoc = await PDFDocument.load(arrayBuffer);
+            const page = pdfDoc.getPages()[0];
+            const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+            const pageHeight = page.getHeight();
+
+            // Photo Logic strictly for Admission Form
+            if (selectedForm === 'admission form.pdf') {
+                if (photoInput.files && photoInput.files[0]) {
+                    try {
+                        const photoBytes = await photoInput.files[0].arrayBuffer();
+                        const image = photoInput.files[0].type.includes("png") 
+                            ? await pdfDoc.embedPng(photoBytes) 
+                            : await pdfDoc.embedJpg(photoBytes);
+                        
+                        page.drawImage(image, { x: 430, y: pageHeight - 390, width: 90, height: 110 });
+                    } catch (imgErr) {
+                        page.drawRectangle({ x: 430, y: pageHeight - 390, width: 90, height: 110, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+                    }
+                } else {
+                    page.drawRectangle({ x: 430, y: pageHeight - 390, width: 90, height: 110, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+                }
+            }
+
+            let fields = [];
+
+            if (selectedForm === 'admission form.pdf') {
+                fields = [
+                    { text: document.getElementById('univ_name1').value, x: 152, y: pageHeight - 694, size: 7 },
+                    { text: document.getElementById('univ_name2').value, x: 152, y: pageHeight - 714, size: 7 },
+                    { text: document.getElementById('univ_name3').value, x: 152, y: pageHeight - 732, size: 7 },
+                    { text: document.getElementById('class').value, x: 121, y: pageHeight - 276 },
+                    { text: document.getElementById('reg_no').value, x: 363, y: pageHeight - 275 },
+                    { text: document.getElementById('category').value, x: 312, y: pageHeight - 399 },
+                    { text: document.getElementById('name').value, x: 156, y: pageHeight - 399 },
+                    { text: document.getElementById('dob').value, x: 398, y: pageHeight - 399 },
+                    { text: document.getElementById('fname').value, x: 159, y: pageHeight - 425 },
+                    { text: document.getElementById('mname').value, x: 348, y: pageHeight - 425 },
+                    { text: document.getElementById('religion').value, x: 130, y: pageHeight - 452 },
+                    { text: document.getElementById('mobile').value, x: 238, y: pageHeight - 451 },
+                    { text: document.getElementById('aadhar').value, x: 382, y: pageHeight - 451 },
+                    { text: document.getElementById('apaar').value, x: 130, y: pageHeight - 478 },
+                    { text: document.getElementById('email').value, x: 126, y: pageHeight - 502 },
+                    { text: document.getElementById('nationality').value, x: 388, y: pageHeight - 503 },
+                    { text: document.getElementById('domicile').value, x: 124, y: pageHeight - 532 },
+                    { text: document.getElementById('area_type').value, x: 224, y: pageHeight - 533 },
+                    { text: document.getElementById('gender').value, x: 322, y: pageHeight - 533 },
+                    { text: document.getElementById('nss_ncc').value, x: 420, y: pageHeight - 532 },
+                    { text: document.getElementById('address').value, x: 154, y: pageHeight - 547 },
+                    { text: document.getElementById('state').value, x: 120, y: pageHeight - 588 },
+                    { text: document.getElementById('district').value, x: 256, y: pageHeight - 588 },
+                    { text: document.getElementById('pincode').value, x: 376, y: pageHeight - 588 },
+                    { text: document.getElementById('sem1_name').value, x: 94, y: pageHeight - 692 },
+                    { text: document.getElementById('sem1_roll').value, x: 270, y: pageHeight - 694 },
+                    { text: document.getElementById('sem1_res').value, x: 506, y: pageHeight - 694 },
+                    { text: document.getElementById('sem2_name').value, x: 94, y: pageHeight - 713 },
+                    { text: document.getElementById('sem2_roll').value, x: 270, y: pageHeight - 713 },
+                    { text: document.getElementById('sem2_res').value, x: 506, y: pageHeight - 711 },
+                    { text: document.getElementById('sem3_name').value, x: 94, y: pageHeight - 732 },
+                    { text: document.getElementById('sem3_roll').value, x: 270, y: pageHeight - 730 },
+                    { text: document.getElementById('sem3_res').value, x: 506, y: pageHeight - 730 }
+                ];
+            } else if (selectedForm === 'registration form.pdf') {
+                fields = [];
+            } else if (selectedForm === 'identity form.pdf') {
+                fields = [];
+            }
+
+            fields.forEach(f => {
+                if (f.text) {
+                    page.drawText(f.text, { x: f.x, y: f.y, size: f.size || 9, font: font, color: rgb(0, 0, 0) });
+                }
+            });
+
+            const pdfBytes = await pdfDoc.save();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Filled_${selectedForm}`;
+            link.click();
+
+            status.style.color = "#22c55e";
+            status.innerText = "✅ Download Successful!";
+        } catch (err) {
+            console.error(err);
+            status.style.color = "#ef4444";
+            status.innerText = "❌ Error: " + err.message;
+        }
+    }
+</script>
+</body>
+</html>
