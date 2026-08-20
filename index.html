@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master College Form Generator</title>
-    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    
+    <!-- Updated Stable CDNs -->
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
     <style>
         :root {
             --bg-color: #0b0e14;
@@ -561,10 +564,9 @@
         }
     }
 
-    function getSelectedFile(fileInputId) {
-        const fileEl = document.getElementById(fileInputId);
-        if (fileEl && fileEl.files && fileEl.files[0]) return fileEl.files[0];
-        return null;
+    function getVal(id) {
+        const el = document.getElementById(id);
+        return el ? el.value.trim() : '';
     }
 
     window.toggleFormSections = function() {
@@ -584,7 +586,9 @@
     };
 
     document.addEventListener("DOMContentLoaded", function() {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
 
         const chkAdm = document.getElementById('chk_admission');
         const chkReg = document.getElementById('chk_registration');
@@ -630,6 +634,101 @@
 
     async function generateSelectedForms() {
         logMsg("Processing forms generation...");
+
+        if (typeof PDFLib === 'undefined') {
+            logMsg("❌ Error: PDF-Lib CDN library missing or failed to load.");
+            alert("PDF Library not loaded properly! Check network/refresh.");
+            return;
+        }
+
+        const isAdmission = document.getElementById('chk_admission')?.checked;
+        const isRegistration = document.getElementById('chk_registration')?.checked;
+        const isIdentity = document.getElementById('chk_identity')?.checked;
+
+        if (!isAdmission && !isRegistration && !isIdentity) {
+            alert("Please select at least one form to generate!");
+            logMsg("⚠️ Warning: No form selected.");
+            return;
+        }
+
+        try {
+            logMsg("Creating PDF Document...");
+            const pdfDoc = await PDFLib.PDFDocument.create();
+            const page = pdfDoc.addPage([595.28, 841.89]); // Standard A4 Size
+            const { height } = page.getSize();
+
+            let cursorY = height - 40;
+
+            // Header Section
+            page.drawText("COLLEGE APPLICATION FORM", { x: 50, y: cursorY, size: 16 });
+            cursorY -= 30;
+
+            // Form Types Selected
+            let selectedForms = [];
+            if(isAdmission) selectedForms.push("Admission Form");
+            if(isRegistration) selectedForms.push("Registration Form");
+            if(isIdentity) selectedForms.push("Identity Form");
+            
+            page.drawText(`Selected Forms: ${selectedForms.join(', ')}`, { x: 50, y: cursorY, size: 10 });
+            cursorY -= 25;
+
+            // Student Primary Info
+            const name = getVal('name') || 'N/A';
+            const roll = getVal('reg_no') || 'N/A';
+            const studentClass = getVal('class') || 'N/A';
+            const fname = getVal('fname') || 'N/A';
+            const mname = getVal('mname') || 'N/A';
+            const mobile = getVal('mobile') || 'N/A';
+            const category = getVal('category') || 'GENERAL';
+
+            page.drawText(`Student Name: ${name}`, { x: 50, y: cursorY, size: 11 });
+            page.drawText(`Roll/Reg No: ${roll}`, { x: 300, y: cursorY, size: 11 });
+            cursorY -= 20;
+
+            page.drawText(`Class/Course: ${studentClass}`, { x: 50, y: cursorY, size: 11 });
+            page.drawText(`Category: ${category}`, { x: 300, y: cursorY, size: 11 });
+            cursorY -= 20;
+
+            page.drawText(`Father's Name: ${fname}`, { x: 50, y: cursorY, size: 11 });
+            page.drawText(`Mother's Name: ${mname}`, { x: 300, y: cursorY, size: 11 });
+            cursorY -= 20;
+
+            page.drawText(`Mobile: ${mobile}`, { x: 50, y: cursorY, size: 11 });
+            cursorY -= 30;
+
+            // Embedded Photos Check
+            const photoInput = document.getElementById('photoFile');
+            if (photoInput && photoInput.files && photoInput.files[0]) {
+                logMsg("Embedding photo image...");
+                try {
+                    const photoBytes = await photoInput.files[0].arrayBuffer();
+                    let img;
+                    if (photoInput.files[0].type.includes('png')) {
+                        img = await pdfDoc.embedPng(photoBytes);
+                    } else {
+                        img = await pdfDoc.embedJpg(photoBytes);
+                    }
+                    page.drawImage(img, { x: 450, y: height - 160, width: 90, height: 110 });
+                } catch(e) {
+                    logMsg("⚠️ Photo embed error: " + e.message);
+                }
+            }
+
+            logMsg("Generating PDF byte array...");
+            const pdfBytes = await pdfDoc.save();
+
+            logMsg("Downloading PDF...");
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${name.replace(/\s+/g, '_')}_Master_Form.pdf`;
+            link.click();
+
+            logMsg("✓ PDF Form Generated & Downloaded Successfully!");
+        } catch (err) {
+            logMsg(`❌ Generation Error: ${err.message}`);
+            console.error(err);
+        }
     }
 </script>
 
