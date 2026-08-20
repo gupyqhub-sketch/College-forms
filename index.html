@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master College Form Generator</title>
     
-    <!-- Updated Stable CDN Direct Links -->
+    <!-- Stable CDN Direct Links -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
@@ -245,7 +245,7 @@
             padding: 10px;
             border-radius: 6px;
             margin-top: 15px;
-            max-height: 140px;
+            max-height: 160px;
             overflow-y: auto;
             border: 1px solid #1a202c;
             white-space: pre-wrap;
@@ -403,55 +403,8 @@
         <span class="file-status" id="signStatus">No signature attached</span>
     </div>
 
-    <div class="section-title">4. Required Supporting Documents (PDF/JPG/PNG Upload)</div>
-
-    <div class="doc-upload-row">
-        <div class="doc-header">
-            <span class="doc-title">1. Marks Sheet of Last Qualifying Exam</span>
-            <label for="doc1_file" class="btn-upload">📁 Choose File</label>
-        </div>
-        <input type="file" id="doc1_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc1_status')">
-        <span class="file-status" id="doc1_status">Not uploaded</span>
-    </div>
-
-    <div class="doc-upload-row">
-        <div class="doc-header">
-            <span class="doc-title">2. SC/BC/ST/EWS Certificate</span>
-            <label for="doc2_file" class="btn-upload">📁 Choose File</label>
-        </div>
-        <input type="file" id="doc2_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc2_status')">
-        <span class="file-status" id="doc2_status">Not uploaded</span>
-    </div>
-
-    <div class="doc-upload-row">
-        <div class="doc-header">
-            <span class="doc-title">3. Photocopy of Aadhaar Card</span>
-            <label for="doc3_file" class="btn-upload">📁 Choose File</label>
-        </div>
-        <input type="file" id="doc3_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc3_status')">
-        <span class="file-status" id="doc3_status">Not uploaded</span>
-    </div>
-
-    <div class="doc-upload-row">
-        <div class="doc-header">
-            <span class="doc-title">4. Anti-Ragging Certificate</span>
-            <label for="doc4_file" class="btn-upload">📁 Choose File</label>
-        </div>
-        <input type="file" id="doc4_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc4_status')">
-        <span class="file-status" id="doc4_status">Not uploaded</span>
-    </div>
-
-    <div class="doc-upload-row">
-        <div class="doc-header">
-            <span class="doc-title">5. Fee Receipt</span>
-            <label for="doc5_file" class="btn-upload">📁 Choose File</label>
-        </div>
-        <input type="file" id="doc5_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc5_status')">
-        <span class="file-status" id="doc5_status">Not uploaded</span>
-    </div>
-
     <div id="sec_admission_specifics" class="form-section">
-        <div class="section-title">5. Admission Form Specifics</div>
+        <div class="section-title">4. Admission Form Specifics</div>
         <div class="grid-3">
             <div class="field">
                 <label>Sem 1 Roll No.</label>
@@ -469,7 +422,7 @@
     </div>
 
     <div id="sec_course_details" class="form-section">
-        <div class="section-title">6. Course Details</div>
+        <div class="section-title">5. Course Details</div>
 
         <div class="grid-2">
             <div class="field custom-dropdown-wrap">
@@ -575,7 +528,7 @@
 
     function getVal(id) {
         const el = document.getElementById(id);
-        return el ? el.value.trim() : '';
+        return el ? el.value.trim() : 'N/A';
     }
 
     window.toggleFormSections = function() {
@@ -630,73 +583,157 @@
     });
 
     async function generateSelectedForms() {
-        logMsg("Processing forms generation...");
+        logMsg("Processing full form generation...");
 
-        if (typeof window.PDFLib === 'undefined') {
-            logMsg("❌ Error: PDFLib library is not loaded properly.");
-            alert("PDF Library not loaded! Please check internet connection.");
+        if (typeof window.PDFLib === 'undefined' && typeof PDFLib === 'undefined') {
+            logMsg("❌ Error: PDFLib library is missing!");
+            alert("PDF Library not loaded.");
             return;
         }
 
+        const { PDFDocument, rgb, StandardFonts } = window.PDFLib || PDFLib;
+
         try {
-            const { PDFDocument, rgb } = window.PDFLib;
             const pdfDoc = await PDFDocument.create();
-            const page = pdfDoc.addPage([595.28, 841.89]);
-            const { height } = page.getSize();
+            const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+            const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-            let cursorY = height - 40;
+            const page = pdfDoc.addPage([595.28, 841.89]); // A4 Size
+            const { width, height } = page.getSize();
+            let y = height - 40;
 
-            logMsg("Adding form details...");
-            page.drawText("COLLEGE APPLICATION FORM", { x: 50, y: cursorY, size: 16 });
-            cursorY -= 30;
+            // Draw Header Title Box
+            page.drawRectangle({
+                x: 30, y: y - 10, width: width - 60, height: 35,
+                color: rgb(0.08, 0.1, 0.15)
+            });
+            page.drawText("COLLEGE REGISTRATION & ADMISSION FORM", {
+                x: 40, y: y + 2, size: 14, font: fontBold, color: rgb(0, 0.94, 1)
+            });
+            y -= 45;
 
-            const name = getVal('name') || 'Nishant';
-            const roll = getVal('reg_no') || 'N/A';
-            const sClass = getVal('class') || 'B.Sc 3rd Year';
-            const fname = getVal('fname') || 'N/A';
-            const mobile = getVal('mobile') || 'N/A';
-
-            page.drawText(`Student Name: ${name}`, { x: 50, y: cursorY, size: 11 });
-            page.drawText(`Roll No: ${roll}`, { x: 300, y: cursorY, size: 11 });
-            cursorY -= 20;
-
-            page.drawText(`Class: ${sClass}`, { x: 50, y: cursorY, size: 11 });
-            page.drawText(`Mobile: ${mobile}`, { x: 300, y: cursorY, size: 11 });
-            cursorY -= 20;
-
-            page.drawText(`Father's Name: ${fname}`, { x: 50, y: cursorY, size: 11 });
-            cursorY -= 30;
-
-            // Image attachment check
+            // Photo Placeholder / Image Rendering
             const photoInput = document.getElementById('photoFile');
+            let photoEmbedded = false;
             if (photoInput && photoInput.files && photoInput.files[0]) {
-                logMsg("Embedding user photo...");
                 try {
-                    const bytes = await photoInput.files[0].arrayBuffer();
-                    const img = photoInput.files[0].type.includes('png') ? 
-                        await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
-                    page.drawImage(img, { x: 450, y: height - 150, width: 90, height: 110 });
-                } catch (imgErr) {
-                    logMsg("⚠️ Photo embedding skipped: " + imgErr.message);
-                }
+                    const pBytes = await photoInput.files[0].arrayBuffer();
+                    const isPng = photoInput.files[0].type.includes('png');
+                    const img = isPng ? await pdfDoc.embedPng(pBytes) : await pdfDoc.embedJpg(pBytes);
+                    page.drawImage(img, { x: 450, y: y - 90, width: 90, height: 110 });
+                    photoEmbedded = true;
+                } catch(e) { logMsg("⚠️ Photo embed error: " + e.message); }
+            }
+            
+            if (!photoEmbedded) {
+                page.drawRectangle({
+                    x: 450, y: y - 90, width: 90, height: 110,
+                    borderColor: rgb(0.5, 0.5, 0.5), borderWidth: 1
+                });
+                page.drawText("PASSPORT\n PHOTO", { x: 462, y: y - 40, size: 8, font: fontRegular });
             }
 
-            logMsg("Finalizing document...");
+            // Function to Draw Section Header
+            const drawSectionHeader = (title) => {
+                page.drawRectangle({
+                    x: 30, y: y - 5, width: width - 200, height: 18,
+                    color: rgb(0.9, 0.92, 0.95)
+                });
+                page.drawText(title, { x: 35, y: y, size: 10, font: fontBold, color: rgb(0, 0, 0) });
+                y -= 22;
+            };
+
+            // Section 1: Personal Details
+            drawSectionHeader("1. PERSONAL DETAILS");
+            
+            const printField = (label, value, xPos, targetY) => {
+                page.drawText(`${label}:`, { x: xPos, y: targetY, size: 9, font: fontBold, color: rgb(0.2, 0.2, 0.2) });
+                page.drawText(`${value || 'N/A'}`, { x: xPos + 85, y: targetY, size: 9, font: fontRegular });
+            };
+
+            printField("Student Name", getVal('name'), 35, y); y -= 16;
+            printField("Father's Name", getVal('fname'), 35, y); y -= 16;
+            printField("Mother's Name", getVal('mname'), 35, y); y -= 16;
+            printField("Date of Birth", getVal('dob'), 35, y);
+            printField("Gender", getVal('gender'), 240, y); y -= 16;
+            printField("Category", getVal('category'), 35, y);
+            printField("Blood Group", getVal('blood_group'), 240, y); y -= 24;
+
+            // Section 2: Academic Details
+            drawSectionHeader("2. ACADEMIC & IDENTIFICATION DETAILS");
+            printField("Class / Course", getVal('class'), 35, y);
+            printField("Reg/Roll No", getVal('reg_no'), 240, y); y -= 16;
+            printField("Enrolment No", getVal('enrolment_no'), 35, y);
+            printField("APAAR ID", getVal('apaar'), 240, y); y -= 16;
+            printField("Aadhaar No", getVal('aadhar'), 35, y);
+            printField("NSS/NCC", getVal('nss_ncc'), 240, y); y -= 24;
+
+            // Section 3: Semester Roll Numbers
+            if (document.getElementById('chk_admission')?.checked) {
+                drawSectionHeader("3. PREVIOUS SEMESTER ROLL NOS");
+                printField("Sem 1 Roll", getVal('sem1_roll'), 35, y);
+                printField("Sem 2 Roll", getVal('sem2_roll'), 200, y);
+                printField("Sem 3 Roll", getVal('sem3_roll'), 360, y); y -= 24;
+            }
+
+            // Section 4: Course Choice
+            if (document.getElementById('chk_registration')?.checked) {
+                drawSectionHeader("4. SELECTED COURSES & SUBJECTS");
+                page.drawText(`1. ${getVal('course_name_1')} (${getVal('course_id_1')})`, { x: 35, y: y, size: 9, font: fontRegular }); y -= 14;
+                page.drawText(`2. ${getVal('course_name_2')} (${getVal('course_id_2')})`, { x: 35, y: y, size: 9, font: fontRegular }); y -= 14;
+                page.drawText(`3. ${getVal('course_name_3')} (${getVal('course_id_3')})`, { x: 35, y: y, size: 9, font: fontRegular }); y -= 14;
+                if(getVal('internship_course_name') !== 'N/A') {
+                    page.drawText(`Internship: ${getVal('internship_course_name')} (${getVal('internship_course_id')})`, { x: 35, y: y, size: 9, font: fontRegular }); y -= 14;
+                }
+                y -= 10;
+            }
+
+            // Section 5: Contact Info
+            drawSectionHeader("5. CONTACT & ADDRESS DETAILS");
+            printField("Mobile No", getVal('mobile'), 35, y);
+            printField("Emergency No", getVal('emergency_mobile'), 240, y); y -= 16;
+            printField("Email ID", getVal('email'), 35, y); y -= 16;
+            printField("Full Address", getVal('address'), 35, y); y -= 16;
+            printField("District", getVal('district'), 35, y);
+            printField("Pincode", getVal('pincode'), 240, y); y -= 35;
+
+            // Signature Block
+            const signInput = document.getElementById('signFile');
+            if (signInput && signInput.files && signInput.files[0]) {
+                try {
+                    const sBytes = await signInput.files[0].arrayBuffer();
+                    const isPng = signInput.files[0].type.includes('png');
+                    const sImg = isPng ? await pdfDoc.embedPng(sBytes) : await pdfDoc.embedJpg(sBytes);
+                    page.drawImage(sImg, { x: 400, y: y - 20, width: 120, height: 40 });
+                } catch(e) { logMsg("⚠️ Sign embed error: " + e.message); }
+            }
+            
+            page.drawLine({
+                start: { x: 400, y: y - 25 }, end: { x: 530, y: y - 25 },
+                thickness: 1, color: rgb(0, 0, 0)
+            });
+            page.drawText("Student Signature", { x: 420, y: y - 38, size: 9, font: fontBold });
+
+            logMsg("Generating base64 download...");
             const pdfBytes = await pdfDoc.save();
-
-            logMsg("Triggering download...");
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${name}_Form.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
 
-            logMsg("✓ PDF Generated Successfully!");
-        } catch (e) {
-            logMsg("❌ Error: " + e.message);
-            console.error(e);
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = function() {
+                const base64data = reader.result;
+                const link = document.createElement('a');
+                link.href = base64data;
+                link.download = `${getVal('name').replace(/\s+/g, '_')}_Master_Form.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                logMsg("✓ SUCCESS: Full PDF Form Downloaded!");
+            };
+
+        } catch (err) {
+            logMsg("❌ Fatal Render Error: " + err.message);
+            console.error(err);
         }
     }
 </script>
