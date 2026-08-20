@@ -113,6 +113,512 @@
             gap: 12px;
         }
 
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-size: 12px;
+            color: var(--label-color);
+            font-weight: 500;
+        }
+
+        input[type="text"], select {
+            padding: 9px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .doc-upload-row {
+            background: #1a202c;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .doc-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .upload-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-upload {
+            background: var(--input-bg);
+            border: 1px solid var(--cyber-cyan);
+            color: var(--cyber-cyan);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-upload:hover {
+            background: var(--cyber-cyan);
+            color: #000;
+        }
+
+        .file-status {
+            font-size: 11px;
+            color: #8899a6;
+            font-style: italic;
+        }
+
+        .file-status.uploaded {
+            color: #00ff88;
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        .custom-dropdown-wrap {
+            position: relative;
+        }
+
+        .input-arrow-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-arrow-container input {
+            padding-right: 30px;
+        }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: var(--cyber-cyan);
+            pointer-events: none;
+            transition: transform 0.2s ease;
+        }
+
+        .custom-dropdown-wrap.open .dropdown-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .dropdown-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1e2330;
+            border: 1px solid var(--cyber-cyan);
+            border-radius: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin-top: 3px;
+        }
+
+        .dropdown-options.show {
+            display: block;
+        }
+
+        .option-item {
+            padding: 9px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 1px solid #2a3142;
+            color: #ffffff;
+        }
+
+        .option-item:hover {
+            background: var(--cyber-pink);
+            color: #ffffff;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .btn-submit {
+            background: var(--btn-bg);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background: var(--btn-hover);
+        }
+
+        #log-output {
+            background: #080a0f;
+            color: var(--cyber-cyan);
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            max-height: 120px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid #1a202c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="credit-line">
+        ✨ Design and developed by <span>NISHANT</span>
+    </div>
+
+    <div class="header-title">
+        Master College Form Generator
+    </div>
+
+    <!-- Form Selection -->
+    <div class="section-title">Select Forms to Generate</div>
+    <div class="checkbox-group">
+        <label class="checkbox-item">
+            <input type="checkbox" id="chk_admission" checked> Admission Form
+        </label>
+        <label class="checkbox-item">
+            <input type="checkbox" id="chk_registration" checked> Registration Form
+        </label>
+        <label class="checkbox-item">
+            <input type="checkbox" id="chk_identity"> Identity Form
+        </label>
+    </div>
+
+    <!-- 1. Common Personal & Academic Details -->
+    <div class="section-title">1. Common Personal & Academic Details</div>
+    
+    <div class="grid-4">
+        <div class="field">
+            <label>Class / Course</label>
+            <input type="text" id="class" placeholder="B.Sc 3rd Year">
+        </div>
+        <div class="field">
+            <label>Registration / Roll No.</label>
+            <input type="text" id="reg_no" placeholder="Reg/Roll No.">
+        </div>
+        <div class="field">
+            <label>College Enrolment No.</label>
+            <input type="text" id="enrolment_no" placeholder="Enrolment No.">
+        </div>
+        <div class="field">
+            <label>Category</label>
+            <select id="category">
+                <option value="GENERAL">GENERAL</option>
+                <option value="OBC">OBC</option>
+                <option value="SC">SC</option>
+                <option value="ST">ST</option>
+                <option value="EWS">EWS</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="field">
+            <label>Student Name</label>
+            <input type="text" id="name" placeholder="Enter Name">
+        </div>
+        <div class="field">
+            <label>DOB</label>
+            <input type="text" id="dob" placeholder="DD/MM/YYYY">
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="field">
+            <label>Father's Name</label>
+            <input type="text" id="fname" placeholder="Father's Name">
+        </div>
+        <div class="field">
+            <label>Mother's Name</label>
+            <input type="text" id="mname" placeholder="Mother's Name">
+        </div>
+    </div>
+
+    <!-- 2. Common Contact & Identity Details -->
+    <div class="section-title">2. Common Contact & Identity Details</div>
+    
+    <div class="grid-2">
+        <div class="field">
+            <label>Mobile No.</label>
+            <input type="text" id="mobile" placeholder="Mobile Number">
+        </div>
+        <div class="field">
+            <label>Emergency Mobile No.</label>
+            <input type="text" id="emergency_mobile" placeholder="Emergency No.">
+        </div>
+    </div>
+
+    <div class="grid-3">
+        <div class="field">
+            <label>Aadhaar No.</label>
+            <input type="text" id="aadhar" placeholder="Aadhaar No.">
+        </div>
+        <div class="field">
+            <label>Blood Group</label>
+            <input type="text" id="blood_group" placeholder="e.g. B+">
+        </div>
+        <div class="field">
+            <label>APAAR ID</label>
+            <input type="text" id="apaar" placeholder="APAAR ID">
+        </div>
+    </div>
+
+    <div class="grid-3">
+        <div class="field">
+            <label>Email ID</label>
+            <input type="text" id="email" placeholder="Email Address">
+        </div>
+        <div class="field">
+            <label>Gender</label>
+            <select id="gender">
+                <option value="MALE">MALE</option>
+                <option value="FEMALE">FEMALE</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>NSS/NCC</label>
+            <select id="nss_ncc">
+                <option value="NO">NO</option>
+                <option value="YES">YES</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="grid-3">
+        <div class="field">
+            <label>District</label>
+            <input type="text" id="district" placeholder="GURUGRAM">
+        </div>
+        <div class="field">
+            <label>Pincode</label>
+            <input type="text" id="pincode" placeholder="Pincode">
+        </div>
+        <div class="field">
+            <label>Full Address</label>
+            <input type="text" id="address" placeholder="Enter Full Address">
+        </div>
+    </div>
+
+    <!-- 3. Photo & Signature Attachments -->
+    <div class="section-title">3. Photo & Signature Attachments</div>
+    
+    <div class="doc-upload-row form-section photo-sec">
+        <div class="doc-header">
+            <span class="doc-title">Upload Passport Photo (JPG/PNG)</span>
+            <div class="upload-actions">
+                <label for="photoFile" class="btn-upload">📁 Choose File</label>
+            </div>
+        </div>
+        <input type="file" id="photoFile" accept="image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'photoStatus')">
+        <span class="file-status" id="photoStatus">No photo attached</span>
+    </div>
+
+    <div class="doc-upload-row form-section sign-sec">
+        <div class="doc-header">
+            <span class="doc-title">Upload Signature (JPG/PNG)</span>
+            <div class="upload-actions">
+                <label for="signFile" class="btn-upload">📁 Choose File</label>
+            </div>
+        </div>
+        <input type="file" id="signFile" accept="image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'signStatus')">
+        <span class="file-status" id="signStatus">No signature attached</span>
+    </div>
+
+    <!-- 4. Mandatory Supporting Documents Attachments -->
+    <div class="section-title">4. Required Supporting Documents (PDF/JPG/PNG Upload)</div>
+
+    <!-- 1. Last Exam Marksheet -->
+    <div class="doc-upload-row">
+        <div class="doc-header">
+            <span class="doc-title">1. Marks Sheet of Last Qualifying Exam</span>
+            <div class="upload-actions">
+                <label for="doc1_file" class="btn-upload">📁 Choose File</label>
+            </div>
+        </div>
+        <input type="file" id="doc1_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc1_status')">
+        <span class="file-status" id="doc1_status">Not uploaded</span>
+    </div>
+
+    <!-- 2. SC/BC/ST/EWS Certificate -->
+    <div class="doc-upload-row">
+        <div class="doc-header">
+            <span class="doc-title">2. SC/BC/ST/EWS Certificate</span>
+            <div class="upload-actions">
+                <label for="doc2_file" class="btn-upload">📁 Choose File</label>
+            </div>
+        </div>
+        <input type="file" id="doc2_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc2_status')">
+        <span class="file-status" id="doc2_status">Not uploaded</span>
+    </div>
+
+    <!-- 3. Aadhaar Card -->
+    <div class="doc-upload-row">
+        <div class="doc-header">
+            <span class="doc-title">3. Photocopy of Aadhaar Card</span>
+            <div class="upload-actions">
+                <label for="doc3_file" class="btn-upload">📁 Choose File</label>
+            </div>
+        </div>
+        <input type="file" id="doc3_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc3_status')">
+        <span class="file-status" id="doc3_status">Not uploaded</span>
+    </div>
+
+    <!-- 4. Anti-Ragging Certificate -->
+    <div class="doc-upload-row">
+        <div class="doc-header">
+            <span class="doc-title">4. Anti-Ragging Certificate</span>
+            <div class="upload-actions">
+                <label for="doc4_file" class="btn-upload">📁 Choose File</label>
+            </div>
+        </div>
+        <input type="file" id="doc4_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc4_status')">
+        <span class="file-status" id="doc4_status">Not uploaded</span>
+    </div>
+
+    <!-- 5. Fee Receipt -->
+    <div class="doc-upload-row">
+        <div class="doc-header">
+            <span class="doc-title">5. Fee Receipt</span>
+            <div class="upload-actions">
+                <label for="doc5_file" class="btn-upload">📁 Choose File</label>
+            </div>
+        </div>
+        <input type="file" id="doc5_file" accept="application/pdf,image/jpeg,image/jpg,image/png" onchange="handleDocChange(this, 'doc5_status')">
+        <span class="file-status" id="doc5_status">Not uploaded</span>
+    </div>
+
+    <!-- 5. Admission Specifics -->
+    <div id="sec_admission_specifics" class="form-section">
+        <div class="section-title">5. Admission Form Specifics</div>
+        <div class="grid-3">
+            <div class="field">
+                <label>Sem 1 Roll No.</label>
+                <input type="text" id="sem1_roll" placeholder="Sem 1 Roll">
+            </div>
+            <div class="field">
+                <label>Sem 2 Roll No.</label>
+                <input type="text" id="sem2_roll" placeholder="Sem 2 Roll">
+            </div>
+            <div class="field">
+                <label>Sem 3 Roll No.</label>
+                <input type="text" id="sem3_roll" placeholder="Sem 3 Roll">
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Course Details -->
+    <div id="sec_course_details" class="form-section">
+        <div class="section-title">6. Course Details</div>
+
+        <div class="grid-2">
+            <div class="field custom-dropdown-wrap">
+                <label>Course Name 1</label>
+                <div class="input-arrow-container">
+                    <input type="text" id="course_name_1" placeholder="Chemistry-V" autocomplete="off">
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-options">
+                    <div class="option-item">Chemistry-V</div>
+                </div>
+            </div>
+            <div class="field custom-dropdown-wrap">
+                <label>Course ID 1</label>
+                <div class="input-arrow-container">
+                    <input type="text" id="course_id_1" placeholder="240/CHE/CC/501" autocomplete="off">
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-options">
+                    <div class="option-item">240/CHE/CC/501</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="field custom-dropdown-wrap">
+                <label>Course Name 2</label>
+                <div class="input-arrow-container">
+                    <input type="text" id="course_name_2" placeholder="Genetics And Environmental Biology" autocomplete="off">
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-options">
+                    <div class="option-item">Genetics And Environmental Biology</div>
+                </div>
+            </div>
+            <div class="field custom-dropdown-wrap">
+                <label>Course ID 2</label>
+                <div class="input-arrow-container">
+                    <input type="text" id="course_id_2" placeholder="240/ZOO/CC/501" autocomplete="off">
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div class="dropdown-options">
+                    <div class="option-item">240/ZOO/CC/501</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="field custom-dropdown-wrap">
+                <label>Course Name 3</label>
+                <div class="input-arrow-container">
+                    <input type="text" id="course_name_3" placeholder="Economic Botany and Plant Biotechnology" autocomplete="off">
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div cla        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
         .field {
             display: flex;
             flex-direction: column;
