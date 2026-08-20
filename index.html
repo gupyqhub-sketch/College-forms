@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master College Form Generator</title>
     
-    <!-- Updated Stable CDNs -->
-    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Updated Stable CDN Direct Links -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
     <style>
         :root {
@@ -245,9 +245,10 @@
             padding: 10px;
             border-radius: 6px;
             margin-top: 15px;
-            max-height: 120px;
+            max-height: 140px;
             overflow-y: auto;
             border: 1px solid #1a202c;
+            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -556,6 +557,14 @@
 </div>
 
 <script>
+    function logMsg(msg) {
+        const logger = document.getElementById('log-output');
+        if (logger) {
+            logger.innerText += `\n> ${msg}`;
+            logger.scrollTop = logger.scrollHeight;
+        }
+    }
+
     function handleDocChange(input, statusId) {
         const statusEl = document.getElementById(statusId);
         if (input.files && input.files[0]) {
@@ -586,10 +595,6 @@
     };
 
     document.addEventListener("DOMContentLoaded", function() {
-        if (window.pdfjsLib) {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        }
-
         const chkAdm = document.getElementById('chk_admission');
         const chkReg = document.getElementById('chk_registration');
         const chkId = document.getElementById('chk_identity');
@@ -624,110 +629,74 @@
         });
     });
 
-    function logMsg(msg) {
-        const logger = document.getElementById('log-output');
-        if (logger) {
-            logger.innerText += `\n> ${msg}`;
-            logger.scrollTop = logger.scrollHeight;
-        }
-    }
-
     async function generateSelectedForms() {
         logMsg("Processing forms generation...");
 
-        if (typeof PDFLib === 'undefined') {
-            logMsg("❌ Error: PDF-Lib CDN library missing or failed to load.");
-            alert("PDF Library not loaded properly! Check network/refresh.");
-            return;
-        }
-
-        const isAdmission = document.getElementById('chk_admission')?.checked;
-        const isRegistration = document.getElementById('chk_registration')?.checked;
-        const isIdentity = document.getElementById('chk_identity')?.checked;
-
-        if (!isAdmission && !isRegistration && !isIdentity) {
-            alert("Please select at least one form to generate!");
-            logMsg("⚠️ Warning: No form selected.");
+        if (typeof window.PDFLib === 'undefined') {
+            logMsg("❌ Error: PDFLib library is not loaded properly.");
+            alert("PDF Library not loaded! Please check internet connection.");
             return;
         }
 
         try {
-            logMsg("Creating PDF Document...");
-            const pdfDoc = await PDFLib.PDFDocument.create();
-            const page = pdfDoc.addPage([595.28, 841.89]); // Standard A4 Size
+            const { PDFDocument, rgb } = window.PDFLib;
+            const pdfDoc = await PDFDocument.create();
+            const page = pdfDoc.addPage([595.28, 841.89]);
             const { height } = page.getSize();
 
             let cursorY = height - 40;
 
-            // Header Section
+            logMsg("Adding form details...");
             page.drawText("COLLEGE APPLICATION FORM", { x: 50, y: cursorY, size: 16 });
             cursorY -= 30;
 
-            // Form Types Selected
-            let selectedForms = [];
-            if(isAdmission) selectedForms.push("Admission Form");
-            if(isRegistration) selectedForms.push("Registration Form");
-            if(isIdentity) selectedForms.push("Identity Form");
-            
-            page.drawText(`Selected Forms: ${selectedForms.join(', ')}`, { x: 50, y: cursorY, size: 10 });
-            cursorY -= 25;
-
-            // Student Primary Info
-            const name = getVal('name') || 'N/A';
+            const name = getVal('name') || 'Nishant';
             const roll = getVal('reg_no') || 'N/A';
-            const studentClass = getVal('class') || 'N/A';
+            const sClass = getVal('class') || 'B.Sc 3rd Year';
             const fname = getVal('fname') || 'N/A';
-            const mname = getVal('mname') || 'N/A';
             const mobile = getVal('mobile') || 'N/A';
-            const category = getVal('category') || 'GENERAL';
 
             page.drawText(`Student Name: ${name}`, { x: 50, y: cursorY, size: 11 });
-            page.drawText(`Roll/Reg No: ${roll}`, { x: 300, y: cursorY, size: 11 });
+            page.drawText(`Roll No: ${roll}`, { x: 300, y: cursorY, size: 11 });
             cursorY -= 20;
 
-            page.drawText(`Class/Course: ${studentClass}`, { x: 50, y: cursorY, size: 11 });
-            page.drawText(`Category: ${category}`, { x: 300, y: cursorY, size: 11 });
+            page.drawText(`Class: ${sClass}`, { x: 50, y: cursorY, size: 11 });
+            page.drawText(`Mobile: ${mobile}`, { x: 300, y: cursorY, size: 11 });
             cursorY -= 20;
 
             page.drawText(`Father's Name: ${fname}`, { x: 50, y: cursorY, size: 11 });
-            page.drawText(`Mother's Name: ${mname}`, { x: 300, y: cursorY, size: 11 });
-            cursorY -= 20;
-
-            page.drawText(`Mobile: ${mobile}`, { x: 50, y: cursorY, size: 11 });
             cursorY -= 30;
 
-            // Embedded Photos Check
+            // Image attachment check
             const photoInput = document.getElementById('photoFile');
             if (photoInput && photoInput.files && photoInput.files[0]) {
-                logMsg("Embedding photo image...");
+                logMsg("Embedding user photo...");
                 try {
-                    const photoBytes = await photoInput.files[0].arrayBuffer();
-                    let img;
-                    if (photoInput.files[0].type.includes('png')) {
-                        img = await pdfDoc.embedPng(photoBytes);
-                    } else {
-                        img = await pdfDoc.embedJpg(photoBytes);
-                    }
-                    page.drawImage(img, { x: 450, y: height - 160, width: 90, height: 110 });
-                } catch(e) {
-                    logMsg("⚠️ Photo embed error: " + e.message);
+                    const bytes = await photoInput.files[0].arrayBuffer();
+                    const img = photoInput.files[0].type.includes('png') ? 
+                        await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+                    page.drawImage(img, { x: 450, y: height - 150, width: 90, height: 110 });
+                } catch (imgErr) {
+                    logMsg("⚠️ Photo embedding skipped: " + imgErr.message);
                 }
             }
 
-            logMsg("Generating PDF byte array...");
+            logMsg("Finalizing document...");
             const pdfBytes = await pdfDoc.save();
 
-            logMsg("Downloading PDF...");
+            logMsg("Triggering download...");
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `${name.replace(/\s+/g, '_')}_Master_Form.pdf`;
+            link.download = `${name}_Form.pdf`;
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
 
-            logMsg("✓ PDF Form Generated & Downloaded Successfully!");
-        } catch (err) {
-            logMsg(`❌ Generation Error: ${err.message}`);
-            console.error(err);
+            logMsg("✓ PDF Generated Successfully!");
+        } catch (e) {
+            logMsg("❌ Error: " + e.message);
+            console.error(e);
         }
     }
 </script>
